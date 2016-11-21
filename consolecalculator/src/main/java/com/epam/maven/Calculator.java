@@ -1,23 +1,31 @@
 package com.epam.maven;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Calculator {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);;
+        Scanner scanner = new Scanner(System.in);
         int operator = 0;
-        int nextCalculation;
+        int nextAction;
         boolean doCalculation = true;
         boolean hasOperation;
+        boolean hasOperationMapKey;
+        boolean lastAction;
+
         Operation operation;
-        List<Operation> operationsHistory = new ArrayList<Operation>();
+        Key key = new Key();
+        String keyName;
+        int keyNumber;
+
+        //List<Operation> operationsHistory = new ArrayList<Operation>();
+        Map<Key, Operation> operationsHistoryMap = new LinkedHashMap<Key, Operation>();
 
 
         System.out.println("Добро пожаловать в калькулятор");
+
+        beforeCalculation:
         while (doCalculation) {
 
             hasOperation = false;
@@ -28,14 +36,15 @@ public class Calculator {
                         "1 - сложение\n" +
                         "2 - вычитание\n" +
                         "3 - умножение\n" +
-                        "4 - деление");
+                        "4 - деление\n" +
+                        "0 - выход");
 
                 while (!scanner.hasNextInt()) {
                     scanner.next();
                 }
 
                 operator = scanner.nextInt();
-                if (operator < 1 || operator > 4) {
+                if (operator < 0 || operator > 4) {
                     System.out.println("Неверно выбрана функция!");
                     continue;
                 }
@@ -51,6 +60,9 @@ public class Calculator {
                 }
                 if (operator == 4) {
                     operation.setOperator("/");
+                }
+                if (operator == 0) {
+                    break beforeCalculation;
                 }
 
                 hasOperation = true;
@@ -92,24 +104,86 @@ public class Calculator {
                 System.out.println("Неверная арифметическая операция!");
             }
 
-            operationsHistory.add(operation);
+            //operationsHistory.add(operation);
+            hasOperationMapKey = false;
+            System.out.println("Введите номер и имя для сохранения операции. ");
+            //System.out.println("Введите номер: ");
+            while (!hasOperationMapKey) {
 
-            System.out.println("Чтобы продолжить наберите: 1, чтобы выйти и распечатать историю - любое другое число");
-            while (!scanner.hasNextInt()) {
-                scanner.next();
-            }
-
-            nextCalculation = scanner.nextInt();
-            if (nextCalculation != 1) {
-                System.out.println("История операций:");
-
-                for (Operation o : operationsHistory) {
-
-                    System.out.println(o.toString());
+                System.out.println("Введите номер: ");
+                while (!scanner.hasNextInt()) {
+                    scanner.next();
                 }
 
-                System.out.println("Выход...");
-                doCalculation = false;
+                keyNumber = scanner.nextInt();
+
+                System.out.println("Введите имя: ");
+                while (!scanner.hasNext()) {
+                    scanner.next();
+                }
+
+                keyName = scanner.next();
+
+                key = new Key(keyNumber, keyName);
+                if (operationsHistoryMap.containsKey(key)) {
+                    System.out.println("Введенное сочетание номера и имени уже существует. Введите другое сочетание.");
+                    continue;
+                }
+                hasOperationMapKey = true;
+            }
+
+            operationsHistoryMap.put(key, operation);
+
+            lastAction = false;
+            beforeLastAction:
+            while (!lastAction) {
+                System.out.println("Чтобы продолжить наберите - 1, чтобы найти сохранённый результат - 2, чтобы выйти и распечатать историю - любое другое число");
+                while (!scanner.hasNextInt()) {
+                    scanner.next();
+                }
+
+                nextAction = scanner.nextInt();
+                if (nextAction == 1) {
+                    continue beforeCalculation;
+                }
+                if (nextAction == 2) {
+                    System.out.println("Введите сочетание номера и имени сохраненной операции. ");
+
+
+                        System.out.println("Введите номер: ");
+                        while (!scanner.hasNextInt()) {
+                            scanner.next();
+                        }
+
+                        keyNumber = scanner.nextInt();
+
+                        System.out.println("Введите имя: ");
+                        while (!scanner.hasNext()) {
+                            scanner.next();
+                        }
+
+                        keyName = scanner.next();
+
+                        key = new Key(keyNumber, keyName);
+                        if (!operationsHistoryMap.containsKey(key)) {
+                            System.out.println("Введенное сочетание номера и имени не найдено.");
+                        } else {
+                            System.out.println("Сохранённый результат: " + operationsHistoryMap.get(key).toString());
+                        }
+                        continue beforeLastAction;
+
+                } else {
+                    System.out.println("История операций:");
+
+                    for (Key k : operationsHistoryMap.keySet()) {
+
+                        System.out.println(k.toString() + " " + operationsHistoryMap.get(k).toString());
+                    }
+
+                    System.out.println("Выход...");
+                    doCalculation = false;
+                    break beforeLastAction;
+                }
             }
 
         }
