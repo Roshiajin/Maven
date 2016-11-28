@@ -14,7 +14,7 @@ public class Calculator {
         boolean hasOperationMapKey;
         boolean lastAction;
 
-        Operation operation;
+        Operation operation = null;
         Key key = new Key();
         String keyName;
         int keyNumber;
@@ -29,7 +29,7 @@ public class Calculator {
         while (doCalculation) {
 
             hasOperation = false;
-            operation = new Operation();
+            //operation = new Operation();
 
             while (!hasOperation) {
                 System.out.println("Выберете функцию:\n" +
@@ -50,16 +50,16 @@ public class Calculator {
                 }
 
                 if (operator == 1) {
-                    operation.setOperator("+");
+                    operation = new Operation(new Addition());
                 }
                 if (operator == 2) {
-                    operation.setOperator("-");
+                    operation = new Operation(new Subtraction());
                 }
                 if (operator == 3) {
-                    operation.setOperator("*");
+                    operation = new Operation(new Multiplication());
                 }
                 if (operator == 4) {
-                    operation.setOperator("/");
+                    operation = new Operation(new Division());
                 }
                 if (operator == 0) {
                     break beforeCalculation;
@@ -83,18 +83,7 @@ public class Calculator {
             operation.setSecondNumber(scanner.nextInt());
 
             try {
-                if (operator == 1) {
-                    operation.addition();
-                }
-                if (operator == 2) {
-                    operation.subtraction();
-                }
-                if (operator == 3) {
-                    operation.multiplication();
-                }
-                if (operator == 4) {
-                    operation.division();
-                }
+                operation.calculateResult();
 
                 //Print result
                 System.out.println("Результат: " + operation.getResult());
@@ -102,6 +91,7 @@ public class Calculator {
 
             } catch (ArithmeticException e) {
                 System.out.println("Неверная арифметическая операция!");
+                System.out.println("Подробнее: " + e.getMessage());
             }
 
             //operationsHistory.add(operation);

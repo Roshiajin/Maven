@@ -9,6 +9,12 @@ public class Operation {
     private int secondNumber;
     private String operator;
     private double result;
+    private MathOperation mathOperation;
+
+    public Operation(MathOperation mathOperation) {
+        this.mathOperation = mathOperation;
+        setOperator(this.mathOperation.getOperationSign());
+    }
 
     public int getFirstNumber() {
         return firstNumber;
@@ -30,7 +36,7 @@ public class Operation {
         return operator;
     }
 
-    public void setOperator(String operator) {
+    private void setOperator(String operator) {
         this.operator = operator;
     }
 
@@ -38,31 +44,12 @@ public class Operation {
         return result;
     }
 
-    public void setResult(double result) {
+    private void setResult(double result) {
         this.result = result;
     }
 
-    public void addition () {
-
-        setResult(firstNumber + secondNumber);
-    }
-
-    public void subtraction () {
-
-        setResult(firstNumber - secondNumber);
-    }
-
-    public void  multiplication () {
-
-        setResult(firstNumber * secondNumber);
-    }
-    public void division () throws ArithmeticException {
-
-        setResult((double) firstNumber / secondNumber);
-
-        if (getSecondNumber() == 0) {
-            throw new ArithmeticException("/ by zero");
-        }
+    public void calculateResult() {
+        setResult(mathOperation.calculate(getFirstNumber(), getSecondNumber()));
     }
 
     @Override
