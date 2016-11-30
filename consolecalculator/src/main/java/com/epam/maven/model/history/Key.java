@@ -1,4 +1,4 @@
-package com.epam.maven;
+package com.epam.maven.model.history;
 
 /**
  * Created by Alexander_Gaptullin on 11/18/2016.

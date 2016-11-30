@@ -1,4 +1,4 @@
-package com.epam.maven;
+package com.epam.maven.model.operation;
 
 public interface MathOperation {
 

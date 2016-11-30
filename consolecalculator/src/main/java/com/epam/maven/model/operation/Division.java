@@ -1,4 +1,4 @@
-package com.epam.maven;
+package com.epam.maven.model.operation;
 
 /**
  * Created by Alexander_Gaptullin on 11/28/2016.

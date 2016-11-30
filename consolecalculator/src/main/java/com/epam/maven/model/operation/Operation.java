@@ -1,8 +1,5 @@
-package com.epam.maven;
+package com.epam.maven.model.operation;
 
-/**
- * Created by Alexander_Gaptullin on 11/17/2016.
- */
 public class Operation {
 
     private int firstNumber;
@@ -54,7 +51,7 @@ public class Operation {
 
     @Override
     public String toString() {
-        return  firstNumber +
+        return firstNumber +
                 operator +
                 secondNumber +
                 "=" + result;
