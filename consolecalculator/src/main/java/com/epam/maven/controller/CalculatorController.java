@@ -4,8 +4,10 @@ import com.epam.maven.model.history.OperationHistory;
 import com.epam.maven.model.operation.*;
 import com.epam.maven.visualinterface.VisualInterfacePrinter;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class CalculatorController {
 
@@ -23,6 +25,20 @@ public class CalculatorController {
 
     private OperationHistory operationHistory;
 
+    private final int[] allowedOperations = {0,1,2,3,4};
+
+    public CalculatorController() {
+        this(System.in);
+    }
+
+    public CalculatorController(InputStream inputStream) {
+        this.scanner = new Scanner(inputStream);
+        this.stage = new HashMap<>();
+        this.visualInterfacePrinter = new VisualInterfacePrinter();
+        this.operationHistory = new OperationHistory();
+        setNextStage("Beginning");
+    }
+
     public void setStage(String stageName, boolean stageState) {
         stage.put(stageName, stageState);
     }
@@ -36,18 +52,10 @@ public class CalculatorController {
     }
 
     public void setNextStage(String nextStage) {
-        setStage(this.currentStage, false);
+        if (this.currentStage != null)
+            setStage(this.currentStage, false);
         setStage(nextStage, true);
         this.currentStage = nextStage;
-    }
-
-
-    public CalculatorController() {
-        this.scanner = new Scanner(System.in);
-        this.stage = new HashMap<String, Boolean>();
-        this.visualInterfacePrinter = new VisualInterfacePrinter();
-        this.operationHistory = new OperationHistory();
-        setNextStage("Beginning");
     }
 
     public String getInputStringValue() {
@@ -82,8 +90,6 @@ public class CalculatorController {
                 visualInterfacePrinter.printWrongMathOperation(e.getMessage());
                 setNextStage("NextAction");
             }
-
-
         }
         if (getStage("PrintResult")) {
             visualInterfacePrinter.printResult(String.valueOf(operation.getResult()));
@@ -138,7 +144,7 @@ public class CalculatorController {
     }
 
     public boolean operatorValidation() {
-        if (operator < 0 || operator > 4) {
+        if (!IntStream.of(allowedOperations).anyMatch(x -> x == operator)) {
             visualInterfacePrinter.printWrongFunction();
             return false;
         }
@@ -200,6 +206,8 @@ public class CalculatorController {
     }
 
     public void getOperationHistory() {
-        visualInterfacePrinter.printAllHistory(operationHistory);
+
+        if (operationHistory.getAll().size() > 0)
+            visualInterfacePrinter.printAllHistory(operationHistory);
     }
 }
