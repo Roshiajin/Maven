@@ -1,5 +1,6 @@
 package com.epam.maven.controller;
 
+import com.epam.maven.model.history.Key;
 import com.epam.maven.model.history.OperationHistory;
 import com.epam.maven.model.operation.*;
 import com.epam.maven.visualinterface.VisualInterfacePrinter;
@@ -24,6 +25,8 @@ public class CalculatorController {
     private Operation operation = null;
 
     private OperationHistory operationHistory;
+
+    private boolean hasStage = true;
 
     private final int[] allowedOperations = {0,1,2,3,4};
 
@@ -72,46 +75,57 @@ public class CalculatorController {
         return scanner.nextInt();
     }
 
+    public OperationHistory getHistory() {
+        return operationHistory;
+    }
+
+    public Operation getHistoryByName(int number, String name) {
+        return operationHistory.getAll().get(new Key(number, name));
+    }
+
     public void executeStage() {
 
-        if (getStage("Beginning")) {
-            visualInterfacePrinter.printGreetings();
-            setNextStage("OperatorChoosing");
-        }
-        if (getStage("OperatorChoosing")) {
-            operatorChoosing();
-        }
-        if (getStage("InputNumbers")) {
-            inputNumbers();
-            try {
-                operation.calculateResult();
-                setNextStage("PrintResult");
-            } catch (ArithmeticException e) {
-                visualInterfacePrinter.printWrongMathOperation(e.getMessage());
+        while (hasStage) {
+
+            if (getStage("Beginning")) {
+                visualInterfacePrinter.printGreetings();
+                setNextStage("OperatorChoosing");
+            }
+            if (getStage("OperatorChoosing")) {
+                operatorChoosing();
+            }
+            if (getStage("InputNumbers")) {
+                inputNumbers();
+                try {
+                    operation.calculateResult();
+                    setNextStage("PrintResult");
+                } catch (ArithmeticException e) {
+                    visualInterfacePrinter.printWrongMathOperation(e.getMessage());
+                    setNextStage("NextAction");
+                }
+            }
+            if (getStage("PrintResult")) {
+                visualInterfacePrinter.printResult(String.valueOf(operation.getResult()));
+                setNextStage("SaveResult");
+            }
+            if (getStage("SaveResult")) {
+                visualInterfacePrinter.printSavingHistory();
+                saveResult();
                 setNextStage("NextAction");
             }
+            if (getStage("NextAction")) {
+                nextActionChoosing();
+            }
+            if (getStage("PrintHistoryByName")) {
+                getOperationHistoryByName();
+                setNextStage("NextAction");
+            }
+            if (getStage("Exit")) {
+                getOperationHistory();
+                visualInterfacePrinter.exit();
+                break;
+            }
         }
-        if (getStage("PrintResult")) {
-            visualInterfacePrinter.printResult(String.valueOf(operation.getResult()));
-            setNextStage("SaveResult");
-        }
-        if (getStage("SaveResult")) {
-            visualInterfacePrinter.printSavingHistory();
-            saveResult();
-            setNextStage("NextAction");
-        }
-        if (getStage("NextAction")) {
-            nextActionChoosing();
-        }
-        if (getStage("PrintHistoryByName")) {
-            getOperationHistoryByName();
-            setNextStage("NextAction");
-        }
-        if (getStage("Exit")) {
-            getOperationHistory();
-            visualInterfacePrinter.exit();
-        } else
-            executeStage();
     }
 
     public void operatorChoosing() {

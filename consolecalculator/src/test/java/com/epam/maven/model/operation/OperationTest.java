@@ -1,6 +1,5 @@
-package com.epam.maven;
+package com.epam.maven.model.operation;
 
-import com.epam.maven.model.operation.*;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

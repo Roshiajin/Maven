@@ -6,8 +6,9 @@ public class Calculator {
 
     public static void main(String[] args) {
 
-       CalculatorController controller = new CalculatorController();
-       controller.executeStage();
+        CalculatorController controller = new CalculatorController();
+
+        controller.executeStage();
 
     }
 
