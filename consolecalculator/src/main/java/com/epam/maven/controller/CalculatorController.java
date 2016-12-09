@@ -4,6 +4,8 @@ import com.epam.maven.model.history.Key;
 import com.epam.maven.model.history.OperationHistory;
 import com.epam.maven.model.operation.*;
 import com.epam.maven.visualinterface.VisualInterfacePrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 public class CalculatorController {
+
+    private static final Logger logger = LogManager.getLogger(CalculatorController.class);
 
     private Scanner scanner;
 
@@ -87,6 +91,8 @@ public class CalculatorController {
 
         while (hasStage) {
 
+            logger.info("Current stage: {}", this.currentStage);
+
             if (getStage("Beginning")) {
                 visualInterfacePrinter.printGreetings();
                 setNextStage("OperatorChoosing");
@@ -96,10 +102,12 @@ public class CalculatorController {
             }
             if (getStage("InputNumbers")) {
                 inputNumbers();
+
                 try {
                     operation.calculateResult();
                     setNextStage("PrintResult");
                 } catch (ArithmeticException e) {
+                    logger.catching(e);
                     visualInterfacePrinter.printWrongMathOperation(e.getMessage());
                     setNextStage("NextAction");
                 }
