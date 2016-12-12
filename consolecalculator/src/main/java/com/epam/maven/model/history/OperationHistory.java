@@ -1,11 +1,16 @@
 package com.epam.maven.model.history;
 
+import com.epam.maven.controller.CalculatorController;
 import com.epam.maven.model.operation.Operation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OperationHistory {
+
+    private static final Logger logger = LogManager.getLogger(OperationHistory.class.getSimpleName());
 
     private Map<Key, Operation> history;
 
@@ -39,6 +44,8 @@ public class OperationHistory {
     }
 
     public void put() {
+        logger.info("put history for key {} and value {}", key.toString(), value.toString());
+
         history.put(key, value);
     }
 

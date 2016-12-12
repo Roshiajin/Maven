@@ -1,9 +1,14 @@
 package com.epam.maven.visualinterface;
 
+import com.epam.maven.controller.CalculatorController;
 import com.epam.maven.model.history.Key;
 import com.epam.maven.model.history.OperationHistory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class VisualInterfacePrinter {
+
+    private static final Logger logger = LogManager.getLogger(VisualInterfacePrinter.class.getSimpleName());
 
     public VisualInterfacePrinter() {
     }
