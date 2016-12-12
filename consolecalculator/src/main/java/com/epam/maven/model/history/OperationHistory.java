@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class OperationHistory {
 
-    private static final Logger logger = LogManager.getLogger(OperationHistory.class.getSimpleName());
+    private static final Logger logger = LogManager.getLogger(OperationHistory.class);
 
     private Map<Key, Operation> history;
 

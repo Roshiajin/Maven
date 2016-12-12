@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 public class VisualInterfacePrinter {
 
-    private static final Logger logger = LogManager.getLogger(VisualInterfacePrinter.class.getSimpleName());
+    private static final Logger logger = LogManager.getLogger(VisualInterfacePrinter.class);
 
     public VisualInterfacePrinter() {
     }

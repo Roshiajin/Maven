@@ -1,6 +1,12 @@
 package com.epam.maven.model.operation;
 
+import com.epam.maven.visualinterface.VisualInterfacePrinter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Operation {
+
+    private static final Logger logger = LogManager.getLogger(Operation.class);
 
     private int firstNumber;
     private int secondNumber;
@@ -18,6 +24,9 @@ public class Operation {
     }
 
     public void setFirstNumber(int firstNumber) {
+
+        logger.trace("operation.setFirstNumber {}", firstNumber);
+
         this.firstNumber = firstNumber;
     }
 
@@ -26,6 +35,9 @@ public class Operation {
     }
 
     public void setSecondNumber(int secondNumber) {
+
+        logger.trace("operation.setSecondNumber {}", secondNumber);
+
         this.secondNumber = secondNumber;
     }
 

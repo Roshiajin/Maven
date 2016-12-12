@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 public class CalculatorController {
 
-    private static final Logger logger = LogManager.getLogger(CalculatorController.class.getSimpleName());
+    private static final Logger logger = LogManager.getLogger(CalculatorController.class);
 
     private Scanner scanner;
 

@@ -3,6 +3,7 @@
     <Properties>
         <Property name="CalculatorController">logs/CalculatorController.log</Property>
         <Property name="OperationHistory">logs/OperationHistory.log</Property>
+        <Property name="Operation">logs/Operation.log</Property>
     </Properties>
 
     <Appenders>
@@ -16,6 +17,9 @@
         <File name="OperationHistory-all" fileName="${OperationHistory}" append="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </File>
+        <File name="Operation" fileName="${Operation}" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
     </Appenders>
 
     <Loggers>
@@ -23,12 +27,18 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <Logger name="CalculatorController" additivity="false" level="ALL">
+        <Logger name="com.epam.maven.controller.CalculatorController" additivity="false" level="ALL">
             <AppenderRef ref="CalculatorController-all" level="ALL" />
         </Logger>
 
-        <Logger name="OperationHistory" additivity="false" level="ALL">
+        <Logger name="com.epam.maven.model.history.OperationHistory" additivity="false" level="ALL">
             <AppenderRef ref="OperationHistory-all" level="ALL" />
         </Logger>
+
+        <Logger name="com.epam.maven.model.operation" additivity="false" level="trace">
+            <AppenderRef ref="Operation" level="trace" />
+        </Logger>
+
+
     </Loggers>
 </Configuration>
