@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="CalculatorController">logs/CalculatorController.log</Property>
+        <Property name="OperationHistory">logs/OperationHistory.log</Property>
+        <Property name="Operation">logs/Operation.log</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+
+        <File name="CalculatorController-all" fileName="${CalculatorController}" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+        <File name="OperationHistory-all" fileName="${OperationHistory}" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+        <File name="Operation" fileName="${Operation}" append="true">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <Logger name="com.epam.maven.controller.CalculatorController" additivity="false" level="ALL">
+            <AppenderRef ref="CalculatorController-all" level="ALL" />
+        </Logger>
+
+        <Logger name="com.epam.maven.model.history.OperationHistory" additivity="false" level="ALL">
+            <AppenderRef ref="OperationHistory-all" level="ALL" />
+        </Logger>
+
+        <Logger name="com.epam.maven.model.operation" additivity="false" level="trace">
+            <AppenderRef ref="Operation" level="trace" />
+        </Logger>
+
+
+    </Loggers>
+</Configuration>
