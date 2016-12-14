@@ -7,15 +7,18 @@ import java.util.List;
 public class Main
 {
 
-    private static int id = 0;
+    private String url;
+    private String dbUsername = "";
+    private String dbPassword = "";
 
     static class Person {
         private String name;
-        private String desc;
+        private String info;
 
-        public Person (String name, String desc) {
+
+        public Person (String name, String info) {
             this.name = name;
-            this.desc = desc;
+            this.info = info;
         }
 
         public String getName() {
@@ -26,34 +29,47 @@ public class Main
             this.name = name;
         }
 
-        public String getDesc() {
-            return desc;
+        public String getInfo() {
+            return info;
         }
 
-        public void setDesc(String desc) {
-            this.desc = desc;
+        public void setInfo(String info) {
+            this.info = info;
         }
     }
 
-    public static int getNextId() {
-        return ++id;
-    }
-
-    public static void init() throws ClassNotFoundException {
+    public void initH2() throws ClassNotFoundException {
         Class.forName("org.h2.Driver");
+        this.url = "jdbc:h2:mem:test";
     }
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:h2:mem:test");
+    public void initOracle() throws ClassNotFoundException {
+        Class.forName("oracle.jdbc.OracleDriver");
+        this.url = "jdbc:oracle:thin:@localhost:1521:orcl";
+        this.dbUsername = "jdbcuser";
+        this.dbPassword = "jdbcuser";
+    }
+
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(this.url, dbUsername, dbPassword);
     }
 
     public static void main( String[] args ) throws Exception
     {
-        init();
-        createDatabase();
+        Main mainJdbc = new Main();
 
-        selectQuery();
-        insertQuery("Tony", "Iron Man");
+//        mainJdbc.initH2();
+//        mainJdbc.createTableH2();
+//        mainJdbc.updateQuery(5, "Bruce Banner", "Hulk");
+//
+//        mainJdbc.selectQueryById(5);
+//
+//        mainJdbc.deleteQuery(3);
+
+        mainJdbc.initOracle();
+
+        mainJdbc.selectQuery();
+        mainJdbc.insertQuery("Tony", "Iron Man");
 
         List<Person> heroList = new ArrayList<>();
         heroList.add(new Person("Steve", "Captain America"));
@@ -62,23 +78,22 @@ public class Main
         heroList.add(new Person("Bruce", "Hulk"));
         heroList.add(new Person("Peter", "Spider-Man"));
 
-        batchInsertQuery(heroList);
+        mainJdbc.batchInsertQuery(heroList);
 
-        selectQuery();
+        mainJdbc.selectQuery();
 
-        updateQuery(5, "Bruce Banner", "Hulk");
+        mainJdbc.updateQueryByName("Peter", "Peter Parker", "Spider-Man");
+        mainJdbc.callInsertProcedure("Jessica","Jessica Jones");
 
-        selectQueryById(5);
+        mainJdbc.selectQuery();
 
-        deleteQuery(3);
-
-        selectQuery();
+        mainJdbc.deleteAllQuery();
 
     }
 
-    public static void createDatabase() throws SQLException {
+    public void createTableH2() throws SQLException {
 
-        String query = "create table TEST (id int primary key, name varchar2(100), desc varchar2(2000))";
+        String query = "create table TEST (id int auto_increment primary key, name varchar2(100), info varchar2(2000))";
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
 
@@ -92,41 +107,46 @@ public class Main
 
     }
 
-    public static int insertQuery(String name, String desc) throws SQLException{
+    public long insertQuery(String name, String info) throws SQLException{
 
-        String query = "insert into TEST values (?,?,?)";
-        int generatedId;
+        String query = "insert into TEST (name, info) values (?,?)";
+        long generatedId = 0L;
+        String generatedColumns[] = {"ID"};
 
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
-            generatedId = getNextId();
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query, generatedColumns)) {
 
-            preparedStatement.setInt(1, generatedId);
-            preparedStatement.setString(2, name);
-            preparedStatement.setString(3, desc);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, info);
             preparedStatement.executeUpdate();
 
-            System.out.println("generated id for "+ name +": " + generatedId);
+            try (ResultSet rs = preparedStatement.getGeneratedKeys()) {
+                while (rs.next()) {
+                    generatedId = rs.getLong(1);
+
+                    System.out.println("generated id for "+ name +": " + generatedId);
+                }
+            }
 
             return generatedId;
 
         } catch (SQLException e) {
-            System.out.println("createDatabase exception: " + e.getMessage());
-            return 0;
+            System.out.println("insertQuery exception: " + e.getMessage());
+            return generatedId;
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return generatedId;
         }
     }
 
-    public static void updateQuery (int id, String name, String desc) throws SQLException {
+    public void updateQuery (int id, String name, String info) throws SQLException {
 
-        String query = "UPDATE TEST set name = ?, desc = ? where id = ?";
+        String query = "UPDATE TEST set name = ?, info = ? where id = ?";
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)){
 
             preparedStatement.setInt(3, id);
             preparedStatement.setString(1, name);
-            preparedStatement.setString(2, desc);
+            preparedStatement.setString(2, info);
             preparedStatement.executeUpdate();
 
             System.out.println(id + " id updated!");
@@ -138,7 +158,27 @@ public class Main
         }
     }
 
-    public static void deleteQuery(int id) throws SQLException {
+    public void updateQueryByName (String oldName, String newName, String info) throws SQLException {
+
+        String query = "UPDATE TEST set name = ?, info = ? where name = ?";
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)){
+
+            preparedStatement.setString(3, oldName);
+            preparedStatement.setString(1, newName);
+            preparedStatement.setString(2, info);
+            preparedStatement.executeUpdate();
+
+            System.out.println(oldName + " updated!");
+
+        } catch (SQLException e) {
+            System.out.println("update query: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteQuery(int id) throws SQLException {
         String query = "delete from TEST where id = ?";
         int result;
 
@@ -157,7 +197,24 @@ public class Main
         }
     }
 
-    public static void selectQuery() throws SQLException {
+    public void deleteAllQuery() throws SQLException {
+        String query = "delete from TEST";
+        int result;
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)){
+
+            result = preparedStatement.executeUpdate();
+
+            System.out.println(result + " rows deleted");
+
+        } catch (SQLException e) {
+            System.out.println("delete query: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void selectQuery() throws SQLException {
 
         String query = "select * from TEST";
 
@@ -165,7 +222,7 @@ public class Main
              ResultSet rs = preparedStatement.executeQuery()){
 
             while (rs.next()) {
-                System.out.println("Id: " + rs.getInt("id") + " Name: " + rs.getString("name") + " desc: " + rs.getString("desc"));
+                System.out.println("{Id: " + rs.getInt("id") + "}, {Name: " + rs.getString("name") + "}, {info: " + rs.getString("info")+"}");
             }
             System.out.println("----------------");
 
@@ -177,7 +234,7 @@ public class Main
 
     }
 
-    public static void selectQueryById(int id) throws SQLException {
+    public void selectQueryById(int id) throws SQLException {
         String query = "select * from TEST where id = ?";
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
@@ -187,7 +244,7 @@ public class Main
             try (ResultSet rs = preparedStatement.executeQuery()) {
 
                 while (rs.next()) {
-                    System.out.println("Id: " + rs.getInt("id") + " Name: " + rs.getString("name") + " desc: " + rs.getString("desc"));
+                    System.out.println("{Id: " + rs.getInt("id") + "}, {Name: " + rs.getString("name") + "}, {info: " + rs.getString("info")+"}");
                 }
                 System.out.println("----------------");
             }
@@ -200,17 +257,16 @@ public class Main
 
     }
 
-    public static void batchInsertQuery(List<Person> rows) throws SQLException {
+    public void batchInsertQuery(List<Person> rows) throws SQLException {
 
-        String query = "insert into TEST values (?,?,?)";
+        String query = "insert into TEST (name, info) values (?,?)";
         int [] batch;
 
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query)) {
 
             for (Person person : rows) {
-                preparedStatement.setInt(1, getNextId());
-                preparedStatement.setString(2, person.getName());
-                preparedStatement.setString(3, person.getDesc());
+                preparedStatement.setString(1, person.getName());
+                preparedStatement.setString(2, person.getInfo());
                 preparedStatement.addBatch();
 
             }
@@ -226,6 +282,20 @@ public class Main
         }
 
 
+    }
+
+    public void callInsertProcedure(String name, String info) throws SQLException{
+
+        String callMethod = "{call testpkg.insert_test(:p_name, :p_info, :p_id)}";
+
+        CallableStatement callableStatement = getConnection().prepareCall(callMethod);
+
+        callableStatement.setString("p_name", name);
+        callableStatement.setString("p_info", info);
+        callableStatement.registerOutParameter("p_id", Types.INTEGER);
+        callableStatement.execute();
+
+        System.out.println("generated id for "+ name +": " +callableStatement.getLong("p_id"));
     }
 
 }
