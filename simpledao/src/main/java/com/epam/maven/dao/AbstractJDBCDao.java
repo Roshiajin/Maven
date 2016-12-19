@@ -18,6 +18,11 @@ import java.util.Set;
  */
 public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Integer> implements GenericDao<T, PK> {
 
+    private DaoFactory<Connection> parentFactory;
+
+    private Connection connection;
+
+    private Set<ManyToOne> relations = new HashSet<ManyToOne>();
     /**
      * Возвращает sql запрос для получения всех записей.
      * <p/>
@@ -60,12 +65,6 @@ public abstract class AbstractJDBCDao<T extends Identified<PK>, PK extends Integ
      * Устанавливает аргументы update запроса в соответствии со значением полей объекта object.
      */
     protected abstract void prepareStatementForUpdate(PreparedStatement statement, T object) throws PersistException;
-
-    private DaoFactory<Connection> parentFactory;
-
-    private Connection connection;
-
-    private Set<ManyToOne> relations = new HashSet<ManyToOne>();
 
     @Override
     public T getByPK(Integer key) throws PersistException {
