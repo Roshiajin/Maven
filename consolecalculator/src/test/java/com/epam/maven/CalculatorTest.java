@@ -12,8 +12,7 @@ import java.io.InputStream;
 /**
  * Unit test for simple App.
  */
-public class CalculatorTest
-    extends TestCase
+public class CalculatorTest extends TestCase
 {
 
     public CalculatorTest(String testName )
